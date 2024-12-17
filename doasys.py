@@ -96,9 +96,20 @@ def noise_torch(s, snr):
     return (s + noise).view(bsz, -1, signal_dim)
 
 # 定义了一个频谱模块的神经网络类。它包括输入层、多个卷积层和输出层。
+# mod 变量是一个列表，其中包含了多个神经网络层。
+# 它在 spectrumModule 和 DeepFreq 类的构造函数中被定义，用于存储卷积层、批标准化层和 ReLU 激活函数。
+# 随后，mod 被传递给 nn.Sequential 创建一个顺序容器，存储在 self.mod 属性中，用于定义模型的中间层序列
 class spectrumModule(nn.Module):
-    def __init__(self, signal_dim=8, n_filters=8, n_layers=3, inner_dim=125,
-                 kernel_size=3):
+    def __init__(self, signal_dim=8, n_filters=8, n_layers=3, inner_dim=125,kernel_size=3):
+        # signal_dim: 输入信号的维度。
+        # n_filters: 每个卷积层的滤波器数量。
+        # n_layers: 卷积层的数量。
+        # inner_dim: 第一个线性变换后的维度。
+        # kernel_size: 卷积核的大小。
+
+        # in_layer: 输入层，使用线性变换将输入信号转换为内部表示。
+        # mod: 卷积层序列，包括卷积层、批量归一化层和ReLU激活函数。
+        # out_layer: 输出层，使用线性变换将内部表示转换为输出信号。
         super().__init__()
         self.n_filters = n_filters
         self.in_layer = nn.Linear(2 * signal_dim, inner_dim * n_filters, bias=False)
@@ -117,11 +128,17 @@ class spectrumModule(nn.Module):
         self.out_layer = nn.Linear(inner_dim * n_filters, 2 * signal_dim, bias=False)
 
     def forward(self, inp):
+        # inp: 输入信号
+        # bsz: 批量大小
+        # 将输入信号展平。
         bsz = inp.size(0)
         inp = inp.view(bsz, -1)
+        # 通过输入层进行线性变换。
         x = self.in_layer(inp).view(bsz, self.n_filters, -1)
+        # 通过卷积层序列进行卷积操作。
         x = self.mod(x)
         x = x.view(bsz, -1)
+        # 通过输出层进行线性变换，得到最终输出
         x = self.out_layer(x).view(bsz, -1)
         return x
 

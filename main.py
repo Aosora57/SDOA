@@ -19,6 +19,9 @@ import matlab.engine
 def make_hankel(signal, m):
     """
     Auxiliary function used in MUSIC.
+    作用：生成Hankel矩阵，用于MUSIC算法。
+    输入：信号signal和矩阵的行数m。
+    输出：Hankel矩阵
     """
     n = len(signal)
     h = np.zeros((m, n - m + 1), dtype='complex128')
@@ -31,6 +34,9 @@ def make_hankel(signal, m):
 def music(signal, xgrid, nfreq, m=20):
     """
     Compute frequency representation obtained with MUSIC.
+    作用：使用MUSIC算法计算频率表示。
+    输入：信号signal，频率网格xgrid，频率数量nfreq，以及Hankel矩阵的行数m。
+    输出：MUSIC频率表示
     """
     music_fr = np.zeros((signal.shape[0], len(xgrid)))
     for n in range(signal.shape[0]):
