@@ -5,7 +5,7 @@ import torch.nn as nn
 import scipy.signal
 import math
 import matplotlib.pyplot as plt
-
+import torch.nn.functional as F
 
 # 生成目标方向角 (DOA) 的函数。它在给定的范围内随机生成目标方向角，并确保它们之间的最小间隔
 def gen_doa(target_num, doa, ant_num):
@@ -141,7 +141,6 @@ class spectrumModule(nn.Module):
         # 通过输出层进行线性变换，得到最终输出
         x = self.out_layer(x).view(bsz, -1)
         return x
-
 # 定义了一个深度频率模块的神经网络类。它包括输入层、多个卷积层和一个转置卷积层。
 class DeepFreq(nn.Module):
     def __init__(self, signal_dim=8, n_filters=8, n_layers=3, inner_dim=125,

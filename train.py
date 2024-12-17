@@ -52,6 +52,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # 设置设备：根据是否有可用的 GPU，设置 use_cuda 标志
     if torch.cuda.is_available():
         args.use_cuda = True
     else:
@@ -107,6 +108,16 @@ if __name__ == '__main__':
     nonlinear = args.nonlinear
     is_nonlinear = args.is_nonlinear
 
+
+    '''
+    train_type == 0：所有参数设为0，即无位置扰动、无幅度扰动、无相位扰动、无互耦、无非线性效应。
+    train_type == 1：只有位置扰动，其他参数设为0。
+    train_type == 2：只有幅度扰动，其他参数设为0。
+    train_type == 3：只有相位扰动，其他参数设为0。
+    train_type == 4：只有互耦，其他参数设为0。
+    train_type == 5：只有非线性效应，其他参数设为0。
+    train_type == 6：所有参数都使用最大值，即包含位置扰动、幅度扰动、相位扰动、互耦和非线性效应
+    '''
     for idx in range(args.train_num):
         for train_type in range(7):
             if train_type == 0:
@@ -159,7 +170,7 @@ if __name__ == '__main__':
                 args.nonlinear = nonlinear
                 args.is_nonlinear = is_nonlinear
 
-            # generate the training data
+            # generate the training data 生产训练数据部分
             signal, doa, target_num = doasys.gen_signal(args.n_training, args)
             ref_sp = doasys.gen_refsp(doa, ref_grid, args.gaussian_std / args.ant_num)
             signal = torch.from_numpy(signal).float()
@@ -167,6 +178,9 @@ if __name__ == '__main__':
             ref_sp = torch.from_numpy(ref_sp).float()
             dataset = data_utils.TensorDataset(signal, ref_sp, doa)
             train_loader = data_utils.DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
+
+            # Save the training data to a file
+            # torch.save({'signal': signal, 'doa': doa, 'ref_sp': ref_sp}, 'training_data.pt')
 
             # generate the validation data
             signal, doa, target_num = doasys.gen_signal(args.n_validation, args)
@@ -177,6 +191,9 @@ if __name__ == '__main__':
             noisy_signals = doasys.noise_torch(signal, args.snr)
             dataset = data_utils.TensorDataset(noisy_signals, signal, ref_sp, doa)
             val_loader = data_utils.DataLoader(dataset, batch_size=args.batch_size)
+
+            # Save the validation data to a file
+            # torch.save({'noisy_signals': noisy_signals, 'signal': signal, 'doa': doa, 'ref_sp': ref_sp},'validation_data.pt')
 
             start_epoch = 1
             criterion = torch.nn.MSELoss(reduction='sum')

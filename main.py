@@ -10,7 +10,7 @@ import torch.nn as nn
 import scipy.signal
 import math
 import doasys
-import doa_method
+# import doa_method
 from scipy import io
 
 import matlab.engine
@@ -117,7 +117,6 @@ if __name__ == '__main__':
     # generate the training data
 
     loss_arr = np.load('loss.npz')
-
     loss_train = loss_arr['arr_0']
     loss_val = loss_arr['arr_1']
     if args.use_cuda:
