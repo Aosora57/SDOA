@@ -6,7 +6,7 @@ import torch.utils.data as data_utils
 import doasys
 
 if __name__ == '__main__':
-    # 解析命令行参数：使用argparse 模块解析命令行参数，设置训练和验证数据的数量、网络结构参数、天线参数、噪声参数等
+    #  解析命令行参数：使用argparse 模块解析命令行参数，设置训练和验证数据的数量、网络结构参数、天线参数、噪声参数等
     parser = argparse.ArgumentParser()
 
     # parser.add_argument('--numpy_seed', type=int, default=222)
