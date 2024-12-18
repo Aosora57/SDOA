@@ -55,7 +55,7 @@ if __name__ == '__main__':
     is_anm = True
     is_proposed = True
 
-    is_fig = True
+    is_fig = False
     is_save = False
 
     parser = argparse.ArgumentParser()
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     #     dic_music[idx2] = doasys.steer_vec(doa_grid[idx2], args.d, antnum_reshape, np.zeros(antnum_reshape).T)
 
     for n in range(SNR_range.size):
-        n_test = 1 # 10
+        n_test = 10 # 10
         RMSE[n] = 0
         RMSE_FFT[n] = 0
         RMSE_MUSIC[n] = 0
@@ -308,6 +308,12 @@ if __name__ == '__main__':
             "SNR (dB): %.2f dB, RMSE (deg): %.2f, RMSE_FFT (deg): %.2f, RMSE_OMP (deg): %.2f, RMSE_ANM (deg): %.2f, RMSE_MUSIC (deg): %.2f" % (
                 SNR_dB, RMSE[n], RMSE_FFT[n], RMSE_OMP[n], RMSE_ANM[n], RMSE_MUSIC[n]))
 
+    '''
+    RMSE (deg) 是以度数表示的均方根误差（Root Mean Square Error, RMSE）。
+    它是用于衡量模型预测值与实际观测值之间差异的指标。
+    用于通过比较估计的到达方向（DOA）角度与真实的DOA角度来评估DOA估计方法的准确性。
+    RMSE 越低，估计越准确
+    '''
     plt.figure()
     plt.semilogy(SNR_range, RMSE, linestyle='-', marker='o', linewidth=2, markersize=8, label='Proposed method')
     plt.semilogy(SNR_range, RMSE_FFT, linestyle='-', marker='v', linewidth=2, markersize=8, label='FFT method')

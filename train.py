@@ -118,6 +118,8 @@ if __name__ == '__main__':
     train_type == 4：只有互耦，其他参数设为0。
     train_type == 5：只有非线性效应，其他参数设为0。
     train_type == 6：所有参数都使用最大值，即包含位置扰动、幅度扰动、相位扰动、互耦和非线性效应
+    
+    每个 train_num 是对同一个 net 进行更新。代码中定义的 net 对象在整个训练过程中保持不变，并且在每个训练周期（epoch）中都会对其进行更新。
     '''
     for idx in range(args.train_num):
         for train_type in range(7):
