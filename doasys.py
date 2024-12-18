@@ -116,8 +116,9 @@ class spectrumModule(nn.Module):
         mod = []
         for n in range(n_layers):  # padding=kernel_size - 1
             mod += [
-                nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False,
-                          padding_mode='circular'),
+                # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False,
+                #           padding_mode='circular'),
+                nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding='same', bias=False),
                 # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False),
                 nn.BatchNorm1d(n_filters),
                 nn.ReLU(),

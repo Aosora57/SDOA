@@ -65,7 +65,8 @@ if __name__ == '__main__':
     # ref_grid = np.linspace(-50, 50, 16, endpoint=False)
     ref_grid = doa_grid
 
-    if args.new_train:
+    # if args.new_train:
+    if True:
         if args.net_type == 0:
             net = doasys.spectrumModule(signal_dim=args.ant_num, n_filters=args.n_filters, inner_dim=args.inner_dim,
                                         n_layers=args.n_layers, kernel_size=args.kernel_size)
