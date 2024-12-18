@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--grid_size', type=int, default=10000, help='the size of grids')
     parser.add_argument('--gaussian_std', type=float, default=100, help='the size of grids')
-    parser.add_argument('--batch_size', type=int, default=64, help='the size of batch')
+    parser.add_argument('--batch_size', type=int, default=64, help='the size of batch')#64
 
     # module parameters
     parser.add_argument('--n_layers', type=int, default=6, help='number of convolutional layers in the module')
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     # training policy
     parser.add_argument('--new_train', type=int, default=0, help='train a new network')
-    parser.add_argument('--train_num', type=int, default=1000, help='train a new network')
+    parser.add_argument('--train_num', type=int, default=10, help='train a new network')
     parser.add_argument('--net_type', type=int, default=0, help='the type of network')
 
     args = parser.parse_args()
