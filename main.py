@@ -155,7 +155,7 @@ if __name__ == '__main__':
     #     dic_music[idx2] = doasys.steer_vec(doa_grid[idx2], args.d, antnum_reshape, np.zeros(antnum_reshape).T)
 
     for n in range(SNR_range.size):
-        n_test = 100 # 10
+        n_test = 1 # 10
         RMSE[n] = 0
         RMSE_FFT[n] = 0
         RMSE_MUSIC[n] = 0
@@ -277,12 +277,13 @@ if __name__ == '__main__':
                 tmp_doa = est_doa_omp[0][np.argwhere(est_doa_omp[0] > -90)]
                 if tmp_doa.size==3:
                     io.savemat('sp_OMP.mat', {'array': tmp_doa})
-                plt.stem(tmp_doa, np.ones((tmp_doa.size, 1)), use_line_collection=True, label='OMP method')
-
+                # plt.stem(tmp_doa, np.ones((tmp_doa.size, 1)), use_line_collection=True, label='OMP method')
+                plt.stem(tmp_doa, np.ones((tmp_doa.size, 1)), label='OMP method')
                 tmp_doa = doa[0][np.argwhere(doa[0] > -90)]
                 if tmp_doa.size == 3:
                     io.savemat('truth.mat', {'array': tmp_doa})
-                plt.stem(tmp_doa, np.ones((tmp_doa.size, 1)), use_line_collection=True, label='Ground-truth DOA')
+                # plt.stem(tmp_doa, np.ones((tmp_doa.size, 1)), use_line_collection=True, label='Ground-truth DOA')
+                plt.stem(tmp_doa, np.ones((tmp_doa.size, 1)),  label='Ground-truth DOA')
                 plt.xlabel('Spatial angle (deg)')
                 plt.ylabel('Spatial spectrum')
                 plt.legend()
