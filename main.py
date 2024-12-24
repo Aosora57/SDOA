@@ -140,8 +140,8 @@ if __name__ == '__main__':
         dic_mat_torch = dic_mat_torch.cuda()
 
     # generate the validation data
-    # SNR_range = np.linspace(0, 30, 4)
-    SNR_range = np.linspace(10, 30, 7)
+    SNR_range = np.linspace(0, 30, 6)
+    # SNR_range = np.linspace(10, 30, 7)
     RMSE = np.zeros((SNR_range.size, 1))
     RMSE_FFT = np.zeros((SNR_range.size, 1))
     RMSE_MUSIC = np.zeros((SNR_range.size, 1))
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     #     dic_music[idx2] = doasys.steer_vec(doa_grid[idx2], args.d, antnum_reshape, np.zeros(antnum_reshape).T)
 
     for n in range(SNR_range.size):
-        n_test = 10 # 10
+        n_test = 50 # 10
         RMSE[n] = 0
         RMSE_FFT[n] = 0
         RMSE_MUSIC[n] = 0

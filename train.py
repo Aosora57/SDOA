@@ -202,6 +202,7 @@ if __name__ == '__main__':
             criterion = torch.nn.MSELoss(reduction='sum')
             loss_train = np.zeros((args.n_epochs, 1))
             loss_val = np.zeros((args.n_epochs, 1))
+            # print("args", args)
             for epoch in range(start_epoch, args.n_epochs):
                 net, loss_train[epoch - 1], loss_val[epoch - 1] = doasys.train_net(args=args, net=net,
                                                                                    optimizer=optimizer,
@@ -217,8 +218,8 @@ if __name__ == '__main__':
                 #     plt.semilogy(loss_val[0:epoch-1])
                 #     plt.show()
             if args.net_type == 0:
-                np.savez('loss.npz' , loss_train, loss_val)
-                torch.save(net, 'net.pkl')
+                np.savez('loss_attention.npz' , loss_train, loss_val)
+                torch.save(net, 'net_attention.pkl')
             else:
                 np.savez(('deepfreq_loss_layer%d.npz' % args.n_layers), loss_train, loss_val)
                 torch.save(net, ('deepfreq__layer%d.pkl' % args.n_layers))

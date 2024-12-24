@@ -95,6 +95,109 @@ def noise_torch(s, snr):
     noise = noise * mult[:, None]
     return (s + noise).view(bsz, -1, signal_dim)
 
+
+# class Attention(nn.Module):
+#     def __init__(self, input_dim, hidden_dim):
+#         super(Attention, self).__init__()
+#         self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
+#         self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
+#
+#     def forward(self, x):
+#         # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
+#         scores = torch.tanh(self.Wa(x))
+#         attention_weights = F.softmax(self.Ua(scores), dim=2)
+#         weighted_input = attention_weights * x
+#         print(f"Attention weights shape: {attention_weights.shape}")
+#         output = weighted_input.sum(dim=2)  # 聚合加权输入
+#         print(f"Output shape after attention: {output.shape}")
+#         return output
+
+# class Attention(nn.Module):
+#     def __init__(self, input_dim, hidden_dim, output_dim):
+#         super(Attention, self).__init__()
+#         self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
+#         self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
+#         self.output_layer = nn.Linear(input_dim, output_dim)  # 用于将输出映射到所需维度
+#
+#     def forward(self, x):
+#         # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
+#         scores = torch.tanh(self.Wa(x))
+#         attention_weights = F.softmax(self.Ua(scores), dim=2)
+#         weighted_input = attention_weights * x
+#
+#         print(f"Attention weights shape: {attention_weights.shape}")
+#
+#         # 聚合加权输入，返回形状为 (batch_size, n_filters)
+#         output = weighted_input.sum(dim=2)  # 输出形状为 (batch_size, n_filters)
+#
+#         print(f"Output shape after attention before final layer: {output.shape}")
+#
+#         # 将输出映射到所需维度
+#         output = self.output_layer(output)  # 输出形状为 (batch_size, output_dim)
+#
+#         print(f"Output shape after attention: {output.shape}")
+#
+#         return output
+
+# class Attention(nn.Module):
+#     def __init__(self, input_dim, hidden_dim):
+#         super(Attention, self).__init__()
+#         self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
+#         self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
+#
+#     def forward(self, x):
+#         # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
+#         # x 的形状应为 (64, 2, 32)
+#
+#         # 首先将 x 的形状调整为 (batch_size * n_filters, seq_len)
+#         batch_size, n_filters, seq_len = x.size()
+#         x_reshaped = x.permute(0, 2, 1).contiguous().view(batch_size * seq_len, n_filters)
+#
+#         scores = torch.tanh(self.Wa(x_reshaped))
+#         attention_weights = F.softmax(self.Ua(scores), dim=1)  # 注意这里的 dim=1
+#
+#         # 将 attention_weights 的形状调整回 (batch_size, seq_len, n_filters)
+#         attention_weights = attention_weights.view(batch_size, seq_len, n_filters)
+#
+#         weighted_input = attention_weights * x.permute(0, 2, 1).contiguous()  # 确保维度匹配
+#         output = weighted_input.sum(dim=1)  # 聚合加权输入
+#
+#         print(f"Output shape after attention: {output.shape}")  # 应该是 (batch_size, n_filters)
+#
+#         return output
+class Attention(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(Attention, self).__init__()
+        self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
+        self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
+        self.output_layer = nn.Linear(input_dim, output_dim)  # 用于将输出映射到所需维度
+
+    def forward(self, x):
+        # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
+        batch_size, n_filters, seq_len = x.size()
+
+        # 将 x 转换为 (batch_size * seq_len, n_filters) 以适应线性层
+        x_reshaped = x.permute(0, 2, 1).contiguous().view(batch_size * seq_len, n_filters)
+
+        scores = torch.tanh(self.Wa(x_reshaped))
+        attention_weights = F.softmax(self.Ua(scores), dim=1)  # 注意这里的 dim=1
+
+        # 将 attention_weights 的形状调整回 (batch_size, seq_len, n_filters)
+        attention_weights = attention_weights.view(batch_size, seq_len, n_filters)
+
+        weighted_input = attention_weights * x.permute(0, 2, 1).contiguous()  # 确保维度匹配
+        output = weighted_input.sum(dim=1)  # 聚合加权输入
+
+        # print(f"Output shape after attention before final layer: {output.shape}")  # 应该是 (batch_size, n_filters)
+
+        # 将输出映射到所需维度
+        output = self.output_layer(output)  # 输出形状为 (batch_size, output_dim)
+
+        # print(f"Output shape after attention: {output.shape}")
+
+        return output
+
+
 # 定义了一个频谱模块的神经网络类。它包括输入层、多个卷积层和输出层。
 # mod 变量是一个列表，其中包含了多个神经网络层。
 # 它在 spectrumModule 和 DeepFreq 类的构造函数中被定义，用于存储卷积层、批标准化层和 ReLU 激活函数。
@@ -112,6 +215,7 @@ class spectrumModule(nn.Module):
         # out_layer: 输出层，使用线性变换将内部表示转换为输出信号。
         super().__init__()
         self.n_filters = n_filters
+        dropout_rate=0.5
         self.in_layer = nn.Linear(2 * signal_dim, inner_dim * n_filters, bias=False)
         mod = []
         for n in range(n_layers):  # padding=kernel_size - 1
@@ -122,8 +226,13 @@ class spectrumModule(nn.Module):
                 # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False),
                 nn.BatchNorm1d(n_filters),
                 nn.ReLU(),
+                nn.Dropout(dropout_rate)  # 添加 Dropout 层
             ]
         self.mod = nn.Sequential(*mod)
+        # 注意力层
+        # self.attention = Attention(input_dim=32, hidden_dim=16)
+        # self.attention = Attention(input_dim=n_filters, hidden_dim=16, output_dim=inner_dim * n_filters)
+        self.attention = Attention(input_dim=n_filters, hidden_dim=16, output_dim=inner_dim * n_filters)
         # self.out_layer1 = nn.ConvTranspose1d(n_filters, 1, 4, stride=1, padding=4 // 2, output_padding=1, bias=False)
         # self.linear1 = nn.Linear(inner_dim, 2 * signal_dim, bias=False)
         self.out_layer = nn.Linear(inner_dim * n_filters, 2 * signal_dim, bias=False)
@@ -135,9 +244,20 @@ class spectrumModule(nn.Module):
         bsz = inp.size(0)
         inp = inp.view(bsz, -1)
         # 通过输入层进行线性变换。
+        # print(f"Input shape to linear: {inp.shape}")
         x = self.in_layer(inp).view(bsz, self.n_filters, -1)
+        # print(f"Output shape after linear: {x.shape}")
         # 通过卷积层序列进行卷积操作。
         x = self.mod(x)
+        # 打印输入形状到注意力层
+        # print(f"Input shape to attention: {x.shape}")
+
+        # 注意力机制
+        x = self.attention(x)  # 应用注意力机制
+
+        # 打印输出形状
+        # print(f"Output shape after attention: {x.shape}")
+
         x = x.view(bsz, -1)
         # 通过输出层进行线性变换，得到最终输出
         x = self.out_layer(x).view(bsz, -1)
@@ -201,13 +321,22 @@ def train_net(args, net, optimizer, criterion, train_loader, val_loader,
         dic_mat_torch = torch.from_numpy(dic_mat).float()
         if args.use_cuda:
             dic_mat_torch = dic_mat_torch.cuda()
-
+    '''
+        数据加载: 从 train_loader 中获取一个批次的数据，包括干净信号、目标谱和方向信息。
+        添加噪声: 使用 noise_torch 函数向干净信号添加噪声以生成带噪信号。
+        清除梯度: 在每个批次开始时清除之前计算的梯度，以准备新的反向传播。
+    '''
     for batch_idx, (clean_signal, target_sp, doa) in enumerate(train_loader):
         if args.use_cuda:
             clean_signal, target_sp = clean_signal.cuda(), target_sp.cuda()
-        noisy_signal = noise_torch(clean_signal, args.snr)
+        noisy_signal = noise_torch(clean_signal, args.snr)#向干净信号添加噪声以生成带噪信号
         optimizer.zero_grad()
+        # print(f"input shape noisy_signal: {noisy_signal.shape}")
+        # print(f"input shape batch_size: {args.batch_size}")
+        # 前向传播: 将带噪信号传递给网络，得到输出并重塑为(batch_size, 2, -1)的形状。这里2是特征数量，后面的维度会根据实际情况自动推断。
         output_net = net(noisy_signal).view(args.batch_size, 2, -1)
+        # 打印输出形状
+        # print(f"Output shape before view: {output_net.shape}")
         if net_type == 0:
             mm_real = torch.mm(output_net[:, 0, :], dic_mat_torch[:, 0, :].T) + torch.mm(output_net[:, 1, :],
                                                                                          dic_mat_torch[:, 1, :].T)
@@ -229,8 +358,9 @@ def train_net(args, net, optimizer, criterion, train_loader, val_loader,
         # plt.plot(target_sp.cpu().detach().numpy()[0])
         # plt.show()
 
-    net.eval()
+    net.eval()   # 设置网络为评估模式
     loss_val, fnr_val = 0, 0
+
     for batch_idx, (noisy_signal, _, target_sp, doa) in enumerate(val_loader):
         if args.use_cuda:
             noisy_signal, target_sp = noisy_signal.cuda(), target_sp.cuda()
