@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     # training policy
     parser.add_argument('--new_train', type=int, default=0, help='train a new network')
-    parser.add_argument('--train_num', type=int, default=10, help='train a new network')
+    parser.add_argument('--train_num', type=int, default=80, help='train a new network')
     parser.add_argument('--net_type', type=int, default=0, help='the type of network')
 
     args = parser.parse_args()
@@ -182,6 +182,18 @@ if __name__ == '__main__':
             dataset = data_utils.TensorDataset(signal, ref_sp, doa)
             train_loader = data_utils.DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
+            # 获取 train_loader 中的一个批次的数据
+            for batch in train_loader:
+                signal_batch, ref_sp_batch, doa_batch = batch  # 解包批次数据
+                print("Signal shape:", signal_batch.shape)  # 打印信号的形状
+                print("Reference Spectrum shape:", ref_sp_batch.shape)  # 打印参考谱的形状
+                print("DOA shape:", doa_batch.shape)  # 打印方向信息的形状
+
+                # 输出一条数据
+                print("Single Signal Example:", signal_batch[0])  # 输出第一个样本的信号
+                print("Single Reference Spectrum Example:", ref_sp_batch[0])  # 输出第一个样本的参考谱
+                print("Single DOA Example:", doa_batch[0])  # 输出第一个样本的方向信息
+                break  # 只获取第一条数据，之后退出循环
             # Save the training data to a file
             # torch.save({'signal': signal, 'doa': doa, 'ref_sp': ref_sp}, 'training_data.pt')
 
@@ -218,8 +230,8 @@ if __name__ == '__main__':
                 #     plt.semilogy(loss_val[0:epoch-1])
                 #     plt.show()
             if args.net_type == 0:
-                np.savez('loss_attention.npz' , loss_train, loss_val)
-                torch.save(net, 'net_attention.pkl')
+                np.savez('loss_attention_50.npz' , loss_train, loss_val)
+                torch.save(net, 'net_attention_50.pkl')
             else:
                 np.savez(('deepfreq_loss_layer%d.npz' % args.n_layers), loss_train, loss_val)
                 torch.save(net, ('deepfreq__layer%d.pkl' % args.n_layers))

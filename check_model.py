@@ -1,7 +1,7 @@
 import torch
 
 # Load the pre-trained model
-model = torch.load('pretrained/net.pkl', map_location=torch.device('cpu'))
+model = torch.load('net_attention_50.pkl', map_location=torch.device('cpu'))
 
 # Print the model architecture
 print(model)
@@ -43,7 +43,7 @@ print(model)
 # print("Validation data saved to validation_data.csv")
 
 
-'''
+''' version 1 net.pkl
 spectrumModule(
   (in_layer): Linear(in_features=32, out_features=64, bias=False)
   (mod): Sequential(
@@ -65,6 +65,44 @@ spectrumModule(
     (15): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
     (16): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
     (17): ReLU()
+  )
+  (out_layer): Linear(in_features=64, out_features=32, bias=False)
+)
+'''
+
+''' version 2  net_attention_50.pkl
+spectrumModule(
+  (in_layer): Linear(in_features=32, out_features=64, bias=False)
+  (mod): Sequential(
+    (0): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=same, bias=False)
+    (1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU()
+    (3): Dropout(p=0.5, inplace=False)
+    (4): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=same, bias=False)
+    (5): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (6): ReLU()
+    (7): Dropout(p=0.5, inplace=False)
+    (8): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=same, bias=False)
+    (9): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (10): ReLU()
+    (11): Dropout(p=0.5, inplace=False)
+    (12): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=same, bias=False)
+    (13): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (14): ReLU()
+    (15): Dropout(p=0.5, inplace=False)
+    (16): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=same, bias=False)
+    (17): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (18): ReLU()
+    (19): Dropout(p=0.5, inplace=False)
+    (20): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=same, bias=False)
+    (21): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (22): ReLU()
+    (23): Dropout(p=0.5, inplace=False)
+  )
+  (attention): Attention(
+    (Wa): Linear(in_features=2, out_features=16, bias=True)
+    (Ua): Linear(in_features=16, out_features=2, bias=True)
+    (output_layer): Linear(in_features=2, out_features=64, bias=True)
   )
   (out_layer): Linear(in_features=64, out_features=32, bias=False)
 )
