@@ -95,76 +95,6 @@ def noise_torch(s, snr):
     noise = noise * mult[:, None]
     return (s + noise).view(bsz, -1, signal_dim)
 
-
-# class Attention(nn.Module):
-#     def __init__(self, input_dim, hidden_dim):
-#         super(Attention, self).__init__()
-#         self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
-#         self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
-#
-#     def forward(self, x):
-#         # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
-#         scores = torch.tanh(self.Wa(x))
-#         attention_weights = F.softmax(self.Ua(scores), dim=2)
-#         weighted_input = attention_weights * x
-#         print(f"Attention weights shape: {attention_weights.shape}")
-#         output = weighted_input.sum(dim=2)  # 聚合加权输入
-#         print(f"Output shape after attention: {output.shape}")
-#         return output
-
-# class Attention(nn.Module):
-#     def __init__(self, input_dim, hidden_dim, output_dim):
-#         super(Attention, self).__init__()
-#         self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
-#         self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
-#         self.output_layer = nn.Linear(input_dim, output_dim)  # 用于将输出映射到所需维度
-#
-#     def forward(self, x):
-#         # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
-#         scores = torch.tanh(self.Wa(x))
-#         attention_weights = F.softmax(self.Ua(scores), dim=2)
-#         weighted_input = attention_weights * x
-#
-#         print(f"Attention weights shape: {attention_weights.shape}")
-#
-#         # 聚合加权输入，返回形状为 (batch_size, n_filters)
-#         output = weighted_input.sum(dim=2)  # 输出形状为 (batch_size, n_filters)
-#
-#         print(f"Output shape after attention before final layer: {output.shape}")
-#
-#         # 将输出映射到所需维度
-#         output = self.output_layer(output)  # 输出形状为 (batch_size, output_dim)
-#
-#         print(f"Output shape after attention: {output.shape}")
-#
-#         return output
-
-# class Attention(nn.Module):
-#     def __init__(self, input_dim, hidden_dim):
-#         super(Attention, self).__init__()
-#         self.Wa = nn.Linear(input_dim, hidden_dim)  # 用于计算注意力分数的线性层
-#         self.Ua = nn.Linear(hidden_dim, input_dim)  # 用于计算注意力权重的线性层
-#
-#     def forward(self, x):
-#         # x: 输入特征，形状为 (batch_size, n_filters, seq_len)
-#         # x 的形状应为 (64, 2, 32)
-#
-#         # 首先将 x 的形状调整为 (batch_size * n_filters, seq_len)
-#         batch_size, n_filters, seq_len = x.size()
-#         x_reshaped = x.permute(0, 2, 1).contiguous().view(batch_size * seq_len, n_filters)
-#
-#         scores = torch.tanh(self.Wa(x_reshaped))
-#         attention_weights = F.softmax(self.Ua(scores), dim=1)  # 注意这里的 dim=1
-#
-#         # 将 attention_weights 的形状调整回 (batch_size, seq_len, n_filters)
-#         attention_weights = attention_weights.view(batch_size, seq_len, n_filters)
-#
-#         weighted_input = attention_weights * x.permute(0, 2, 1).contiguous()  # 确保维度匹配
-#         output = weighted_input.sum(dim=1)  # 聚合加权输入
-#
-#         print(f"Output shape after attention: {output.shape}")  # 应该是 (batch_size, n_filters)
-#
-#         return output
 class Attention(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(Attention, self).__init__()
@@ -202,66 +132,148 @@ class Attention(nn.Module):
 # mod 变量是一个列表，其中包含了多个神经网络层。
 # 它在 spectrumModule 和 DeepFreq 类的构造函数中被定义，用于存储卷积层、批标准化层和 ReLU 激活函数。
 # 随后，mod 被传递给 nn.Sequential 创建一个顺序容器，存储在 self.mod 属性中，用于定义模型的中间层序列
-class spectrumModule(nn.Module):
-    def __init__(self, signal_dim=8, n_filters=8, n_layers=3, inner_dim=125,kernel_size=3):
-        # signal_dim: 输入信号的维度。
-        # n_filters: 每个卷积层的滤波器数量。
-        # n_layers: 卷积层的数量。
-        # inner_dim: 第一个线性变换后的维度。
-        # kernel_size: 卷积核的大小。
 
-        # in_layer: 输入层，使用线性变换将输入信号转换为内部表示。
-        # mod: 卷积层序列，包括卷积层、批量归一化层和ReLU激活函数。
-        # out_layer: 输出层，使用线性变换将内部表示转换为输出信号。
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(ResidualBlock, self).__init__()
+        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm1d(out_channels)
+        self.relu = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv1d(out_channels, out_channels, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm1d(out_channels)
+
+        # 如果输入和输出通道数不匹配，使用卷积调整输入形状
+        self.shortcut = nn.Conv1d(in_channels, out_channels, kernel_size=1) if in_channels != out_channels else None
+
+    def forward(self, x):
+        identity = x  # 保存输入以便后续相加
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+
+        if self.shortcut is not None:
+            identity = self.shortcut(identity)
+
+        out += identity  # 残差连接
+        out = self.relu(out)
+
+        return out
+
+class spectrumModule(nn.Module):
+    def __init__(self, signal_dim=8, n_filters=2, n_layers=6, inner_dim=32, kernel_size=3):
         super().__init__()
         self.n_filters = n_filters
-        dropout_rate=0.5
+        self.inner_dim = inner_dim
+
+        # 输入层 - 保持不变
         self.in_layer = nn.Linear(2 * signal_dim, inner_dim * n_filters, bias=False)
+
+        # 修改残差块序列，确保通道数匹配
         mod = []
-        for n in range(n_layers):  # padding=kernel_size - 1
-            mod += [
-                # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False,
-                #           padding_mode='circular'),
-                nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding='same', bias=False),
-                # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False),
-                nn.BatchNorm1d(n_filters),
-                nn.ReLU(),
-                nn.Dropout(dropout_rate)  # 添加 Dropout 层
-            ]
+        current_channels = n_filters  # 初始通道数
+
+        # 第一个残差块处理输入
+        mod.append(ResidualBlock(n_filters, n_filters))
+        
+        # 后续残差块
+        for _ in range(n_layers - 1):
+            mod.append(ResidualBlock(n_filters, n_filters))
+
         self.mod = nn.Sequential(*mod)
-        # 注意力层
-        # self.attention = Attention(input_dim=32, hidden_dim=16)
-        # self.attention = Attention(input_dim=n_filters, hidden_dim=16, output_dim=inner_dim * n_filters)
+
+        # 注意力层和输出层保持不变
         self.attention = Attention(input_dim=n_filters, hidden_dim=16, output_dim=inner_dim * n_filters)
-        # self.out_layer1 = nn.ConvTranspose1d(n_filters, 1, 4, stride=1, padding=4 // 2, output_padding=1, bias=False)
-        # self.linear1 = nn.Linear(inner_dim, 2 * signal_dim, bias=False)
         self.out_layer = nn.Linear(inner_dim * n_filters, 2 * signal_dim, bias=False)
 
     def forward(self, inp):
-        # inp: 输入信号
-        # bsz: 批量大小
-        # 将输入信号展平。
         bsz = inp.size(0)
-        inp = inp.view(bsz, -1)
-        # 通过输入层进行线性变换。
-        # print(f"Input shape to linear: {inp.shape}")
-        x = self.in_layer(inp).view(bsz, self.n_filters, -1)
-        # print(f"Output shape after linear: {x.shape}")
-        # 通过卷积层序列进行卷积操作。
+        
+        # 输入处理
+        inp_flattened = inp.view(bsz, -1)
+        x = self.in_layer(inp_flattened)
+        
+        # 重要：确保reshape后的维度正确
+        x = x.view(bsz, self.n_filters, self.inner_dim)
+        
+        # 通过残差块序列
         x = self.mod(x)
-        # 打印输入形状到注意力层
-        # print(f"Input shape to attention: {x.shape}")
-
-        # 注意力机制
-        x = self.attention(x)  # 应用注意力机制
-
-        # 打印输出形状
-        # print(f"Output shape after attention: {x.shape}")
-
+        
+        # 注意力机制和输出处理
+        x = self.attention(x)
         x = x.view(bsz, -1)
-        # 通过输出层进行线性变换，得到最终输出
-        x = self.out_layer(x).view(bsz, -1)
+        x = self.out_layer(x)
+        
         return x
+# class spectrumModule(nn.Module):
+#     def __init__(self, signal_dim=8, n_filters=8, n_layers=3, inner_dim=125,kernel_size=3):
+#         # signal_dim: 输入信号的维度。
+#         # n_filters: 每个卷积层的滤波器数量。
+#         # n_layers: 卷积层的数量。
+#         # inner_dim: 第一个线性变换后的维度。
+#         # kernel_size: 卷积核的大小。
+#
+#         # in_layer: 输入层，使用线性变换将输入信号转换为内部表示。
+#         # mod: 卷积层序列，包括卷积层、批量归一化层和ReLU激活函数。
+#         # out_layer: 输出层，使用线性变换将内部表示转换为输出信号。
+#         super().__init__()
+#         self.n_filters = n_filters
+#         dropout_rate=0.5
+#         self.in_layer = nn.Linear(2 * signal_dim, inner_dim * n_filters, bias=False)
+#         mod = []
+#         for n in range(n_layers):  # padding=kernel_size - 1
+#             mod += [
+#                 # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False,
+#                 #           padding_mode='circular'),
+#                 nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding='same', bias=False),
+#                 # nn.Conv1d(n_filters, n_filters, kernel_size=kernel_size, padding=kernel_size - 1, bias=False),
+#                 nn.BatchNorm1d(n_filters),
+#                 nn.ReLU(),
+#                 nn.Dropout(dropout_rate)  # 添加 Dropout 层
+#             ]
+#         self.mod = nn.Sequential(*mod)
+#         # 注意力层
+#         # self.attention = Attention(input_dim=32, hidden_dim=16)
+#         # self.attention = Attention(input_dim=n_filters, hidden_dim=16, output_dim=inner_dim * n_filters)
+#         self.attention = Attention(input_dim=n_filters, hidden_dim=16, output_dim=inner_dim * n_filters)
+#         # self.out_layer1 = nn.ConvTranspose1d(n_filters, 1, 4, stride=1, padding=4 // 2, output_padding=1, bias=False)
+#         # self.linear1 = nn.Linear(inner_dim, 2 * signal_dim, bias=False)
+#         self.out_layer = nn.Linear(inner_dim * n_filters, 2 * signal_dim, bias=False)
+#
+#     def forward(self, inp):
+#         # inp: 输入信号
+#         # bsz: 批量大小
+#         # 将输入信号展平。
+#         bsz = inp.size(0)
+#         inp = inp.view(bsz, -1)
+#         # 通过输入层进行线性变换。
+#         # print(f"Input shape to linear: {inp.shape}")
+#         x = self.in_layer(inp).view(bsz, self.n_filters, -1)
+#         # print(f"Output shape after linear: {x.shape}")
+#         # 通过卷积层序列进行卷积操作。
+#         x = self.mod(x)
+#         # 打印输入形状到注意力层
+#         # print(f"Input shape to attention: {x.shape}")
+#
+#         # 注意力机制
+#         x = self.attention(x)  # 应用注意力机制
+#
+#         # 打印输出形状
+#         # print(f"Output shape after attention: {x.shape}")
+#
+#         x = x.view(bsz, -1)
+#         # 通过输出层进行线性变换，得到最终输出
+#         x = self.out_layer(x).view(bsz, -1)
+#         return x
+
+
+
+
+
+
+
 # 定义了一个深度频率模块的神经网络类。它包括输入层、多个卷积层和一个转置卷积层。
 class DeepFreq(nn.Module):
     def __init__(self, signal_dim=8, n_filters=8, n_layers=3, inner_dim=125,

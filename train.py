@@ -183,17 +183,18 @@ if __name__ == '__main__':
             train_loader = data_utils.DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
             # 获取 train_loader 中的一个批次的数据
-            for batch in train_loader:
-                signal_batch, ref_sp_batch, doa_batch = batch  # 解包批次数据
-                print("Signal shape:", signal_batch.shape)  # 打印信号的形状
-                print("Reference Spectrum shape:", ref_sp_batch.shape)  # 打印参考谱的形状
-                print("DOA shape:", doa_batch.shape)  # 打印方向信息的形状
+            # for batch in train_loader:
+            #     signal_batch, ref_sp_batch, doa_batch = batch  # 解包批次数据
+            #     print("Signal shape:", signal_batch.shape)  # 打印信号的形状
+            #     print("Reference Spectrum shape:", ref_sp_batch.shape)  # 打印参考谱的形状
+            #     print("DOA shape:", doa_batch.shape)  # 打印方向信息的形状
+            #
+            #     # 输出一条数据
+            #     print("Single Signal Example:", signal_batch[0])  # 输出第一个样本的信号
+            #     print("Single Reference Spectrum Example:", ref_sp_batch[0])  # 输出第一个样本的参考谱
+            #     print("Single DOA Example:", doa_batch[0])  # 输出第一个样本的方向信息
+            #     break  # 只获取第一条数据，之后退出循环
 
-                # 输出一条数据
-                print("Single Signal Example:", signal_batch[0])  # 输出第一个样本的信号
-                print("Single Reference Spectrum Example:", ref_sp_batch[0])  # 输出第一个样本的参考谱
-                print("Single DOA Example:", doa_batch[0])  # 输出第一个样本的方向信息
-                break  # 只获取第一条数据，之后退出循环
             # Save the training data to a file
             # torch.save({'signal': signal, 'doa': doa, 'ref_sp': ref_sp}, 'training_data.pt')
 
@@ -214,7 +215,7 @@ if __name__ == '__main__':
             criterion = torch.nn.MSELoss(reduction='sum')
             loss_train = np.zeros((args.n_epochs, 1))
             loss_val = np.zeros((args.n_epochs, 1))
-            # print("args", args)
+            print("args", args)
             for epoch in range(start_epoch, args.n_epochs):
                 net, loss_train[epoch - 1], loss_val[epoch - 1] = doasys.train_net(args=args, net=net,
                                                                                    optimizer=optimizer,
@@ -230,8 +231,8 @@ if __name__ == '__main__':
                 #     plt.semilogy(loss_val[0:epoch-1])
                 #     plt.show()
             if args.net_type == 0:
-                np.savez('loss_attention_50.npz' , loss_train, loss_val)
-                torch.save(net, 'net_attention_50.pkl')
+                np.savez('loss_attention_resnet_50.npz' , loss_train, loss_val)
+                torch.save(net, 'net_attention_resnet_50.pkl')
             else:
                 np.savez(('deepfreq_loss_layer%d.npz' % args.n_layers), loss_train, loss_val)
                 torch.save(net, ('deepfreq__layer%d.pkl' % args.n_layers))
