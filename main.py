@@ -15,7 +15,7 @@ from scipy import io
 
 import matlab.engine
 
-num_train = 1
+num_train = 4
 
 def make_hankel(signal, m):
     """
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     #     dic_music[idx2] = doasys.steer_vec(doa_grid[idx2], args.d, antnum_reshape, np.zeros(antnum_reshape).T)
 
     for n in range(SNR_range.size):
-        n_test = 50 # 10
+        n_test = 10 # 10
         RMSE[n] = 0
         RMSE_FFT[n] = 0
         RMSE_MUSIC[n] = 0
