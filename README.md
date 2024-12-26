@@ -47,28 +47,43 @@ tensor([-100.0000, -100.0000,   -9.0772])
 ```
 ```python
 spectrumModule(
-  (in_layer): Linear(in_features=32, out_features=64, bias=False)
-  (mod): Sequential(
-    (0): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
-    (1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (2): ReLU()
-    (3): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
-    (4): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (5): ReLU()
-    (6): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
-    (7): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (8): ReLU()
-    (9): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
-    (10): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (11): ReLU()
-    (12): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
-    (13): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (14): ReLU()
-    (15): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(2,), bias=False, padding_mode=circular)
-    (16): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (17): ReLU()
+  (in_layer): Sequential(
+    (0): Linear(in_features=32, out_features=64, bias=True)
+    (1): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU(inplace=True)
+    (3): Dropout(p=0.1, inplace=False)
   )
-  (out_layer): Linear(in_features=64, out_features=32, bias=False)
+  (blocks): ModuleList(
+    (0-5): 6 x ImprovedResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (se): SEBlock(
+        (avg_pool): AdaptiveAvgPool1d(output_size=1)
+        (fc): Sequential(
+          (0): Linear(in_features=2, out_features=0, bias=False)
+          (1): ReLU(inplace=True)
+          (2): Linear(in_features=0, out_features=2, bias=False)
+          (3): Sigmoid()
+        )
+      )
+      (relu): ReLU(inplace=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (attention): MultiHeadAttention(
+    (query): Linear(in_features=32, out_features=32, bias=True)
+    (key): Linear(in_features=32, out_features=32, bias=True)
+    (value): Linear(in_features=32, out_features=32, bias=True)
+    (out): Linear(in_features=32, out_features=32, bias=True)
+  )
+  (out_layer): Sequential(
+    (0): Linear(in_features=64, out_features=32, bias=True)
+    (1): ReLU(inplace=True)
+    (2): Dropout(p=0.1, inplace=False)
+    (3): Linear(in_features=32, out_features=32, bias=True)
+  )
 )
 ```
 
