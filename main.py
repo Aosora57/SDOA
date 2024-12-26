@@ -15,6 +15,7 @@ from scipy import io
 
 import matlab.engine
 
+num_train = 1
 
 def make_hankel(signal, m):
     """
@@ -115,14 +116,14 @@ if __name__ == '__main__':
     # ref_grid = np.linspace(-50, 50, 16, endpoint=False)
     ref_grid = doa_grid
     # generate the training data
-
-    loss_arr = np.load('loss_attention_resnet_50.npz')
-    loss_train = loss_arr['arr_0']
-    loss_val = loss_arr['arr_1']
+    #修改下面读取 实现读取后缀为全局变量num_train的文件
+    loss_arr = np.load(f'./checkpoints/loss_attention_resnet_train_{num_train}.npz')
+    loss_train = loss_arr['loss_train']
+    loss_val = loss_arr['loss_val']
     if args.use_cuda:
-        net = torch.load('net_attention_resnet_50.pkl')
+        net = torch.load(f'./checkpoints/net_attention_resnet_train_{num_train}.pkl')
     else:
-        net = torch.load('net_attention_resnet_50.pkl', map_location=torch.device('cpu'))
+        net = torch.load(f'./checkpoints/net_attention_resnet_train_{num_train}.pkl', map_location=torch.device('cpu'))
 
     if args.use_cuda:
         net.cuda()
@@ -324,7 +325,7 @@ if __name__ == '__main__':
     plt.ylabel('RMSE (deg)')
     plt.legend()
     plt.grid()
-    plt.savefig('rmse_attention_resnet_50_plot.png')  # Save the plot as a PNG file
+    plt.savefig(f'./checkpoints/rmse_attention_resnet_{num_train}_plot.png')  # Save the plot as a PNG file
     plt.show()
 
     if is_save:

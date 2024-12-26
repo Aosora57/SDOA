@@ -4,6 +4,7 @@ import argparse
 import matplotlib.pyplot as plt
 import torch.utils.data as data_utils
 import doasys
+import os
 
 if __name__ == '__main__':
     # 解析命令行参数：使用argparse 模块解析命令行参数，设置训练和验证数据的数量、网络结构参数、天线参数、噪声参数等
@@ -231,8 +232,22 @@ if __name__ == '__main__':
                 #     plt.semilogy(loss_val[0:epoch-1])
                 #     plt.show()
             if args.net_type == 0:
-                np.savez('loss_attention_resnet_50.npz' , loss_train, loss_val)
-                torch.save(net, 'net_attention_resnet_50.pkl')
+                # 创建保存目录
+                save_dir = 'checkpoints'
+                if not os.path.exists(save_dir):
+                    os.makedirs(save_dir)
+                
+                # 构建包含 train_num 的文件名
+                loss_filename = os.path.join(save_dir, f'loss_attention_resnet_train_{idx}.npz')
+                net_filename = os.path.join(save_dir, f'net_attention_resnet_train_{idx}.pkl')
+                
+                # 保存损失和网络模型
+                np.savez(loss_filename, loss_train=loss_train, loss_val=loss_val)
+                torch.save(net, net_filename)
+                
+                print(f"Saved model and loss for train_num {args.train_num}")
+                print(f"Loss file: {loss_filename}")
+                print(f"Model file: {net_filename}")
             else:
                 np.savez(('deepfreq_loss_layer%d.npz' % args.n_layers), loss_train, loss_val)
                 torch.save(net, ('deepfreq__layer%d.pkl' % args.n_layers))
