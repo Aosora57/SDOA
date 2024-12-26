@@ -166,6 +166,9 @@ spectrumModule(
 
 '''
 
+
+
+
 ''' version 4 net_attention_resnet_50.pkl
 spectrumModule(
   (in_layer): Sequential(
