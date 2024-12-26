@@ -116,13 +116,13 @@ if __name__ == '__main__':
     ref_grid = doa_grid
     # generate the training data
 
-    loss_arr = np.load('loss_attention_50.npz')
+    loss_arr = np.load('loss_attention_resnet_50.npz')
     loss_train = loss_arr['arr_0']
     loss_val = loss_arr['arr_1']
     if args.use_cuda:
-        net = torch.load('net_attention_50.pkl')
+        net = torch.load('net_attention_resnet_50.pkl')
     else:
-        net = torch.load('net_attention_50.pkl', map_location=torch.device('cpu'))
+        net = torch.load('net_attention_resnet_50.pkl', map_location=torch.device('cpu'))
 
     if args.use_cuda:
         net.cuda()
@@ -324,6 +324,7 @@ if __name__ == '__main__':
     plt.ylabel('RMSE (deg)')
     plt.legend()
     plt.grid()
+    plt.savefig('rmse_attention_resnet_50_plot.png')  # Save the plot as a PNG file
     plt.show()
 
     if is_save:

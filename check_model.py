@@ -1,7 +1,7 @@
 import torch
 
 # Load the pre-trained model
-model = torch.load('net_attention_50.pkl', map_location=torch.device('cpu'))
+model = torch.load('net_attention_resnet_50.pkl', map_location=torch.device('cpu'))
 
 # Print the model architecture
 print(model)
@@ -106,4 +106,62 @@ spectrumModule(
   )
   (out_layer): Linear(in_features=64, out_features=32, bias=False)
 )
+'''
+
+''' version 3 net_attention_resnet_50.pkl
+  model = torch.load('net_attention_resnet_50.pkl', map_location=torch.device('cpu'))
+spectrumModule(
+  (in_layer): Linear(in_features=32, out_features=64, bias=False)
+  (mod): Sequential(
+    (0): ResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (1): ResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (2): ResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (3): ResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (4): ResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (5): ResidualBlock(
+      (conv1): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn1): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv1d(2, 2, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn2): BatchNorm1d(2, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (attention): Attention(
+    (Wa): Linear(in_features=2, out_features=16, bias=True)
+    (Ua): Linear(in_features=16, out_features=2, bias=True)
+    (output_layer): Linear(in_features=2, out_features=64, bias=True)
+  )
+  (out_layer): Linear(in_features=64, out_features=32, bias=False)
+)
+
 '''
