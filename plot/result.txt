@@ -1,0 +1,11 @@
+SNR (dB): 0.00 dB, RMSE (deg): 0.27, RMSE_FFT (deg): 0.59, RMSE_OMP (deg): 0.51, RMSE_ANM (deg): 0.95, RMSE_MUSIC (deg): 1.56
+
+SNR (dB): 6.00 dB, RMSE (deg): 0.28, RMSE_FFT (deg): 0.92, RMSE_OMP (deg): 1.02, RMSE_ANM (deg): 0.67, RMSE_MUSIC (deg): 0.92
+
+SNR (dB): 12.00 dB, RMSE (deg): 0.45, RMSE_FFT (deg): 0.59, RMSE_OMP (deg): 0.56, RMSE_ANM (deg): 0.74, RMSE_MUSIC (deg): 0.74
+
+SNR (dB): 18.00 dB, RMSE (deg): 0.75, RMSE_FFT (deg): 0.82, RMSE_OMP (deg): 0.91, RMSE_ANM (deg): 0.51, RMSE_MUSIC (deg): 0.95
+
+SNR (dB): 24.00 dB, RMSE (deg): 0.34, RMSE_FFT (deg): 0.46, RMSE_OMP (deg): 0.49, RMSE_ANM (deg): 0.59, RMSE_MUSIC (deg): 1.10
+
+SNR (dB): 30.00 dB, RMSE (deg): 0.27, RMSE_FFT (deg): 0.26, RMSE_OMP (deg): 0.27, RMSE_ANM (deg): 0.62, RMSE_MUSIC (deg): 0.87

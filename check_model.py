@@ -5,6 +5,7 @@ model = torch.load('net_attention_resnet_50.pkl', map_location=torch.device('cpu
 
 # Print the model architecture
 print(model)
+#保存
 # import torch
 # import pandas as pd
 #
